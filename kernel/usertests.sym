@@ -12,11 +12,11 @@
 00000000 .debug_loc
 00000000 .debug_ranges
 00000000 usertests.c
-00006200 args.1718
+00006200 args.1723
 00000000 ulib.c
 00000000 printf.c
 00003d50 printint
-000058f7 digits.1354
+000058f7 digits.1359
 00000000 umalloc.c
 00006280 freep
 00006284 base
@@ -93,6 +93,7 @@
 0000a9c0 name
 00003b00 strlen
 00003ce2 open
+00003d42 clone
 00003b50 strchr
 00001980 concreate
 00002990 fourteen

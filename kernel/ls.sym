@@ -11,11 +11,11 @@
 00000000 .debug_loc
 00000000 .debug_ranges
 00000000 ls.c
-00000d88 buf.1365
+00000d88 buf.1370
 00000000 ulib.c
 00000000 printf.c
 00000650 printint
-00000aa7 digits.1354
+00000aa7 digits.1359
 00000000 umalloc.c
 00000d98 freep
 00000d9c base
@@ -54,6 +54,7 @@
 00000540 atoi
 00000400 strlen
 000005e2 open
+00000642 clone
 00000450 strchr
 0000060a mkdir
 000005ca close
