@@ -89,3 +89,13 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+//Testing syscall for clone
+int
+sys_clone(void)
+{
+	//Implement
+	
+	return -1;
+}
+
