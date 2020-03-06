@@ -160,6 +160,7 @@ growproc(int n)
 {
   uint sz;
   struct proc *curproc = myproc();
+  struct proc *tp; //thread pointer
 
   sz = curproc->sz;
   if(n > 0){
@@ -171,6 +172,15 @@ growproc(int n)
   }
   curproc->sz = sz;
   switchuvm(curproc);
+
+  acquire(&ptable.lock);
+  for(tp = ptable.proc; tp < &ptable.proc[NPROC]; tp++){
+    if((tp->pgdir == curproc->pgdir) && (tp->parent == curproc))
+    {
+	tp->sz = curproc->sz;
+    }
+  release(&ptable.lock);	
+  }
   return 0;
 }
 
@@ -533,34 +543,45 @@ procdump(void)
   }
 }
 
+//The clone function creates a new kernel threads which shares the same address space
+//as the process that calls it. The file descriptors will have to be copied. The most
+//convenient way we found to create new stacks for each thread was to create user stacks
+//which uses an argument and passes a fake return address to the PC. The new thread will
+//start executing at the address specified by the function. 
 int
-clone(void(*fcn)(void*),void *arg, void *stack){
+clone(void(*func)(void*),void *arg, void *stack){
 //Implement
 	int i, pid;
   	struct proc *np;
   	struct proc *curproc = myproc();
 	uint sp; //Stack pointer
-	uint ustack[2];
-
+	uint ustack[2]; //Setting up the thread stack like exec.c
+	
   	// Allocate process.
   	if((np = allocproc()) == 0){
     		return -1;
   	}
 
-  	// Copy process state from proc.
-  	//if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
-    	//	kfree(np->kstack);
-    	//	np->kstack = 0;
-    	//	np->state = UNUSED;
-	//	return -1;
-	//}
-  	//np->sz = curproc->sz;
-  	//np->parent = curproc;
-  	//*np->tf = *curproc->tf;
-  	np->tstack = stack
+	//We need to copy the process state from the current process.
+	np->tstack = stack;
+	np->pgdir = curproc->pgdir;
+	np->sz = curproc->sz;
+	np->parent = curproc;
 
   	// Clear %eax so that fork returns 0 in the child.
   	np->tf->eax = 0;
+
+	//Setting up the stack for the thread.
+	sp = (uint)stack + PGSIZE; //Setting the top of stack a page above the thread stack.
+	ustack[0] = 0xffffffff; 	//fake return PC
+	ustack[1] = (uint)arg;
+	//Moving memory
+	copyout(np->pgdir, sp - (2 *sizeof(uint)), ustack, 2*sizeof(uint));
+	//Seting the thread's stack pointer
+	np->tf->esp = sp - (2 * sizeof(void *));
+	
+	//Setting the same instruction pointer of the thread to the process
+	np->tf->eip = (uint)func;
 
 	for(i = 0; i < NOFILE; i++)
 		if(curproc->ofile[i])
@@ -580,3 +601,9 @@ clone(void(*fcn)(void*),void *arg, void *stack){
 	return pid;
 }
 
+int
+join(void** stack)
+{
+	//Implement
+	return -1;
+}
