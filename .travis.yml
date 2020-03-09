@@ -1,3 +1,5 @@
-language: c
+language: bash
 
-script: cd kernal && make qemu-nox && make clean
+script: 
+- echo "hello world"
+- ls
