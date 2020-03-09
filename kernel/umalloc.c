@@ -88,3 +88,20 @@ malloc(uint nbytes)
         return 0;
   }
 }
+//We are putting these functions in umalloc because
+//the malloc and free functions are here.
+int
+thread_create(void (*instruction)(void*), void *arg)
+{
+  void *stack = malloc(4096);
+  return clone(instruction, arg, stack); // clone returns the PID
+}
+
+int
+thread_join()
+{
+  void *stack = 0;
+  int pid = join(&stack);
+  free(stack);
+  return(pid);
+}
