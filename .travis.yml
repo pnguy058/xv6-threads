@@ -2,4 +2,13 @@ language: bash
 
 script: 
 - echo "hello world"
-- ls
+- cd ~
+- git clone http://web.mit.edu/ccutler/www/qemu.git -b 6.828-2.3.0
+- sudo apt-get install -y libsdl1.2-dev libtool-bin libglib2.0-dev libz-dev libpixman-1-dev
+- cd qemu
+- ./configure --disable-kvm --target-list="i386-softmmu x86_64-softmmu"
+- make
+- sudo make install
+- cd ~
+- cd kernal
+- make qemu-nox && make clean
