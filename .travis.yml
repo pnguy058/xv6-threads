@@ -12,4 +12,5 @@ before_script:
 
 script:
 - echo "hello world"
-- ls
+- cd kernel
+- make clean && make qemu-nox
