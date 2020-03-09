@@ -51,6 +51,7 @@ struct proc {
   char name[16];               // Process name (debugging)
   void* tstack;		       // Beginning of the thread stack
   int is_thread; 	       // If thread or not
+  int tstack_address;            // Keeping this stack address to free later on.
 };
 
 // Process memory is laid out contiguously, low addresses first:
@@ -58,3 +59,4 @@ struct proc {
 //   original data and bss
 //   fixed-size stack
 //   expandable heap
+//   
