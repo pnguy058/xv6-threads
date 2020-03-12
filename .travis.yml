@@ -9,15 +9,15 @@ cache:
   directories:
     - $HOME/qemu
 
-after_install:
+before_install:
   - bash -e travis-qemu.sh
   - export PATH=$PATH:$HOME/qemu/bin
-
-before_script:
   - docker build -t xv6 .
   - docker run --rm -it xv6 bash
+  - make qemu-nox && make clean
+  - ls
+  - exit
 
 script:
-- make qemu-nox && make clean
 - ls
 - exit
