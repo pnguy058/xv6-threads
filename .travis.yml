@@ -12,6 +12,7 @@ script:
 - make
 - sudo make install
 - cd ~
+- cd ~
 - cd kernel
 - make qemu-nox && make clean
 - ls
