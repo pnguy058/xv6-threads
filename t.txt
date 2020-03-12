@@ -1,5 +1,7 @@
 language: bash
 
+sudo: false
+
 script:
 - echo "hello world"
 - cd ~
@@ -12,3 +14,21 @@ script:
 - cd ~
 - cd kernal
 - make qemu-nox && make clean
+
+language: bash
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/qemu
+
+before_script:
+  - bash -e travis-qemu.sh
+  - export PATH=$PATH:$HOME/qemu/bin
+
+script:
+- echo "hello world"
+- cd kernel
+- make clean && make qemu-nox
+-
