@@ -12,7 +12,7 @@ script:
 - make
 - sudo make install
 - cd ~
-- cd kernal
+- cd kernel
 - make qemu-nox && make clean
 
 language: bash
