@@ -1,12 +1,9 @@
-language: bash
+language: c
+os: linux
 
 services:
   - docker
 
-before_install:
+script:
   - docker build -t xv6 .
   - docker run --rm -it xv6
-
-script:
-- ls
-- exit 0
