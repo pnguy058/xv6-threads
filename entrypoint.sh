@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 cd kernel
-make qemu-nox
+"echo ls" | make qemu-nox
 ls
 
 exec $SHELL
