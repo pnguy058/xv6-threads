@@ -1,3 +1,2 @@
-#!/bin/sh
-ls
-exit
+#!/bin/bash
+echo $1

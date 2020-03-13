@@ -25,9 +25,12 @@ RUN cd qemu && \
         pwd && make install && \
         cd ..
 
+ADD https://api.github.com/repos/pnguy058/xv6-threads/git/refs/heads/clone version.json
+
 RUN cd /root && git clone https://github.com/pnguy058/xv6-threads.git -b clone
 
 WORKDIR /root/xv6-threads
 
-COPY entrypoint.sh /
-ENTRYPOINT ['/entrypoint.sh']
+COPY ./entrypoint.sh /
+
+CMD /bin/bash entrypoint.sh
