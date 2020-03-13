@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 cd kernel
-cat proc.c
-exit
+make qemu-nox && make clean
 
-
+exit 0
 exec $SHELL
