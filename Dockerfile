@@ -33,5 +33,4 @@ WORKDIR /root/xv6-threads
 
 COPY ./entrypoint.sh /
 RUN chmod 755 ./entrypoint.sh
-
-CMD bash
+ENTRYPOINT ["bash", "entrypoint.sh"]
