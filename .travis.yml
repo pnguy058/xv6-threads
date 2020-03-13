@@ -14,7 +14,6 @@ before_install:
   - export PATH=$PATH:$HOME/qemu/bin
   - docker build -t xv6 .
   - docker run --rm -it xv6 bash
-  - make qemu-nox && make clean
   - ls
   - exit
 

@@ -27,6 +27,7 @@ RUN cd qemu && \
 
 RUN cd /root && git clone https://github.com/pnguy058/xv6-threads.git -b clone
 
-WORKDIR /root/xv6-threads/kernel
+WORKDIR /root/xv6-threads
 
-CMD ["sh"]
+COPY entrypoint.sh /
+ENTRYPOINT ['/entrypoint.sh']
