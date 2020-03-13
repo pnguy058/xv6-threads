@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 cd kernel
-echo 'ls' | make qemu-nox
-exit 0
+make
+timeout 30 bash -c "echo 'ls' | make qemu-nox"; exit 0
 exec $SHELL
