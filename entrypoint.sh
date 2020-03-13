@@ -1,2 +1,3 @@
-#!/bin/bash
-echo $1
+#!/usr/bin/env bash
+cd kernel
+cat proc.c
