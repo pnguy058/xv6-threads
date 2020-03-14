@@ -178,10 +178,11 @@ growproc(int n)
   for(tp = ptable.proc; tp < &ptable.proc[NPROC]; tp++){
     if((tp->pgdir == curproc->pgdir) && (tp->parent == curproc))
     {
-	tp->sz = curproc->sz;
+		tp->sz = curproc->sz;
     }
-  release(&ptable.lock);	
+  	
   }
+  release(&ptable.lock);
   return 0;
 }
 
