@@ -100,7 +100,7 @@ thread_create(void (*instruction)(void*), void *arg)
 int
 thread_join()
 {
-  void *stack = 0;
+  void *stack = (void*)0;
   int pid = join(&stack);
   free(stack);
   return(pid);
