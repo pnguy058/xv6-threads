@@ -119,7 +119,10 @@ int
 sys_join(void)
 {
 	//Implement
+	void **stack = (void*)0;
+	if (argptr(0, (void*)&stack, sizeof(void**)) < 0)
+		return -1;
 	
-	return -1;
+	return join(stack);
 }
 
