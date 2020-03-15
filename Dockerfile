@@ -11,6 +11,7 @@ RUN cd /root && git clone https://github.com/pnguy058/xv6-threads.git -b clone
 WORKDIR /root/xv6-threads
 
 COPY ./entrypoint.sh /
+
 RUN chmod 755 ./entrypoint.sh
 
 CMD bash ./entrypoint.sh
