@@ -94,7 +94,10 @@ int
 thread_create(void (*instruction)(void*), void *arg)
 {
   void *stack = malloc(4096);
-  return clone(instruction, arg, stack); // clone returns the PID
+  printf(1, "After initalization of page size in heap.\n");
+  int pid = clone(instruction, arg, stack); // clone returns the PID
+  printf(1, "After pid is returned from clone.\n");
+  return pid;
 }
 
 int

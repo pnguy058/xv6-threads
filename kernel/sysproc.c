@@ -95,15 +95,16 @@ int
 sys_clone(void)
 {
 	//Implement
+	cprintf("sys_clone\n");
 	void *func;
 	void *arg;
 	void *stack;
 
-	if(argptr(0, (void*)&func, sizeof(void*) < 0))
+	if(argptr(0, (void*)&func, sizeof(void*)) < 0)
 		return -1;
-	if(argptr(1, (void*)&arg, sizeof(void*) < 0))
+	if(argptr(1, (void*)&arg, sizeof(void*)) < 0)
 		return -1;
-	if(argptr(2, (void*)&stack, sizeof(void*) < 0))
+	if(argptr(2, (void*)&stack, sizeof(void*)) < 0)
 		return -1;
 	//Making sure that the page is page aligned
 	if((uint)stack % PGSIZE != 0)
@@ -111,6 +112,7 @@ sys_clone(void)
 	//Making sure the stack is not smaller than a page.
 	if(((uint)myproc()->sz - (uint)stack) < PGSIZE)
 		return -1;
+	cprintf("Passed sys_clone check.\n");
 
 	return clone(func, arg, stack);
 }
@@ -119,10 +121,11 @@ int
 sys_join(void)
 {
 	//Implement
+	cprintf("sys_join\n");
 	void **stack = (void*)0;
 	if (argptr(0, (void*)&stack, sizeof(void**)) < 0)
 		return -1;
-	
+	cprintf("passed sys_join check\n");
 	return join(stack);
 }
 

@@ -553,6 +553,7 @@ procdump(void)
 int
 clone(void(*func)(void*),void *arg, void *stack){
 //Implement
+	cprintf( "In clone\n");
 	int i, pid;
   	struct proc *np;
   	struct proc *curproc = myproc();
@@ -573,9 +574,10 @@ clone(void(*func)(void*),void *arg, void *stack){
 		np->tstack_address = ((uint*)stack)[0]; 
 	
 	np->pgdir = curproc->pgdir;
-	np->sz = curproc->sz;
+	np->sz = (uint)stack + PGSIZE;
 	np->parent = curproc;
 	np->is_thread = 1; //is thread
+	*np->tf = *curproc->tf;
   	// Clear %eax so that fork returns 0 in the child.
   	np->tf->eax = 0;
 
@@ -584,14 +586,15 @@ clone(void(*func)(void*),void *arg, void *stack){
 	ustack[0] = 0xffffffff; 	//fake return PC
 	ustack[1] = (uint)arg;
 	
+	sp = sp -  (2 * sizeof(uint));
 	//Moving memory
-	copyout(np->pgdir, sp - (2 *sizeof(uint)), ustack, 2*sizeof(uint));
+	copyout(np->pgdir, sp, ustack, 2*sizeof(uint));
 	//Seting the thread's stack pointer
-	np->tf->esp = sp - (2 * sizeof(void *));
+	np->tf->esp = sp;
 	
 	//Setting the same instruction pointer of the thread to the process
 	np->tf->eip = (uint)func;
-
+	
 	for(i = 0; i < NOFILE; i++)
 		if(curproc->ofile[i])
 			np->ofile[i] = filedup(curproc->ofile[i]);
@@ -606,7 +609,8 @@ clone(void(*func)(void*),void *arg, void *stack){
 	np->state = RUNNABLE;
 
 	release(&ptable.lock);
-
+	
+	cprintf( "Exiting clone.\n");
 	return pid;
 }
 
@@ -618,6 +622,7 @@ clone(void(*func)(void*),void *arg, void *stack){
 int
 join(void** stack)
 {
+  cprintf( "In join.\n");
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
@@ -653,7 +658,7 @@ join(void** stack)
       release(&ptable.lock);
       return -1;
     }
-
+    cprintf( "Exitting join.\n");
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
 }
