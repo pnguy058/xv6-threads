@@ -1,0 +1,13 @@
+FROM ubuntu:latest
+
+RUN apt-get update
+
+RUN apt-get install -y build-essential qemu-system-i386
+
+COPY ./kernel /kernel
+
+WORKDIR /kernel
+
+RUN make
+
+CMD make qemu-nox && make clean
