@@ -2,15 +2,12 @@ FROM ubuntu:latest
 
 RUN apt-get update
 
-RUN apt-get install -y git build-essential qemu-system-i386
+RUN apt-get install -y build-essential qemu-system-i386
 
-ADD https://api.github.com/repos/pnguy058/xv6-threads/git/refs/heads/clone version.json
+COPY ./kernel /kernel
 
-RUN cd /root && git clone https://github.com/pnguy058/xv6-threads.git -b clone
+WORKDIR /kernel
 
-WORKDIR /root/xv6-threads
+RUN make
 
-COPY ./entrypoint.sh /
-RUN chmod 755 ./entrypoint.sh
-
-CMD bash ./entrypoint.sh
+CMD make qemu-nox && make clean
