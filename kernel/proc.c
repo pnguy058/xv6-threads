@@ -266,6 +266,8 @@ exit(void)
 
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if((p->parent == curproc) && (p->pgdir == curproc->pgdir))
+      curproc->pgdir = copyuvm(p->pgdir, p-> sz);
     if(p->parent == curproc){
       p->parent = initproc;
       if(p->state == ZOMBIE)
@@ -622,7 +624,7 @@ clone(void(*func)(void*),void *arg, void *stack){
 int
 join(void** stack)
 {
-  cprintf( "In join.\n");
+  //cprintf( "In join.\n");
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
@@ -631,7 +633,7 @@ join(void** stack)
   for(;;){
     // Scan through table looking for exited children.
     havekids = 0;
-    cprintf( "Join: Kids.\n");
+    //cprintf( "Join: Kids.\n");
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       //Check if the child is a thread
       if((p->parent != curproc)) {
@@ -671,7 +673,7 @@ join(void** stack)
       release(&ptable.lock);
       return -1;
     }
-    cprintf( "End join.\n");
+    //cprintf( "End join.\n");
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
   }
