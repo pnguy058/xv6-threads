@@ -652,7 +652,7 @@ join(void** stack)
         return pid;
       }
     }
-    }
+    
     // No point waiting if we don't have any children.
     if(!havekids || curproc->killed){
       release(&ptable.lock);
@@ -661,4 +661,5 @@ join(void** stack)
     cprintf( "Exitting join.\n");
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+  }
 }

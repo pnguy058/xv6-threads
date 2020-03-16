@@ -94,6 +94,8 @@ int
 thread_create(void (*instruction)(void*), void *arg)
 {
   void *stack = malloc(4096);
+  printf(1, "malloc: %p = %d\n", stack, (uint)stack);
+  
   printf(1, "After initalization of page size in heap.\n");
   int pid = clone(instruction, arg, stack); // clone returns the PID
   printf(1, "After pid is returned from clone.\n");
@@ -106,5 +108,5 @@ thread_join()
   void *stack = (void*)0;
   int pid = join(&stack);
   free(stack);
-  return(pid);
+  return(pid); //swap again
 }
