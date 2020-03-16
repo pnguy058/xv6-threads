@@ -1,15 +1,12 @@
-// Tests creating a single thread, then joining the thread.
+// Tests creating n threads, then joining n threads.
 #include "types.h"
 #include "user.h"
 
-#undef NULL
-#define NULL ((void*)0)
-
-#define PGSIZE (4096)
-
+//Global variables used by all threads
 int ppid;
 int global = 1;
 
+// If assert is True then continue, if False then test failed so kill process
 #define assert(x) if (x) {} else { \
    printf(1, "%s: %d ", __FILE__, __LINE__); \
    printf(1, "assert failed (%s)\n", # x); \
@@ -18,14 +15,21 @@ int global = 1;
    exit(); \
 }
 
-void worker(void *arg_ptr);
+// The instruction that thread_create will point to
+void
+worker(void *arg_ptr) {
+   int arg = *(int*)arg_ptr;
+   assert(arg == 45);
+   global++;
+   exit();
+}
 
 int
 main(int argc, char *argv[])
 {
    ppid = getpid();
    global = 1;
-   int arg = 35;
+   int arg = 45;
 
    if(argc != 2){
     printf(1, "ERROR!!!\nUsage: %s ThreadCount\n", argv[0]);
@@ -33,35 +37,33 @@ main(int argc, char *argv[])
    }
    int n = atoi(argv[1]);
 
-   if (n < 1) {
+   if (n < 1 || n > 100) {
     printf(1, "ThreadCount must between 1 and 100\n");
     exit();
+   }
+   if (n > 61) {
+    printf(1, "Note: Program will crash when ThreadCount > 61\n");
    }
 
    int thread_pid[100] = {-1};
    int join_pid = -1;
-
-   for(int i = 0; i < n; i++) {
+   int i = 0;
+   // Create n threads
+   for(i = 0; i < n; i++) {
      thread_pid[i] = thread_create(worker, &arg);
      printf(1, "Created thread %d. PID : %d\n", (i+1), thread_pid[i]);
      assert(thread_pid[i] > 0);
     }
-   for(int i = 0; i < n; i++) {
+   // Join n threads
+   for(i = 0; i < n; i++) {
      join_pid = thread_join();
      printf(1, "Joined : %d\n", join_pid);
+     assert(thread_pid[i] == join_pid);
     }
-
+   // Checks worker data race for global
    printf(1, "Global = %d.\n", global);
    assert(global == (n + 1));
-   
-   printf(1, "TEST PASSED\n\n");
-   exit();
-}
 
-void
-worker(void *arg_ptr) {
-   int arg = *(int*)arg_ptr;
-   assert(arg == 35);
-   global++;
+   printf(1, "TEST PASSED\n\n");
    exit();
 }
