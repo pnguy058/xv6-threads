@@ -93,8 +93,23 @@ malloc(uint nbytes)
 int
 thread_create(void (*instruction)(void*), void *arg)
 {
+  int stack_address;
   void *stack = malloc(4096);
-  printf(1, "malloc: %p = %d\n", stack, (uint)stack);
+  
+  
+  if((uint)stack % 4096 != 0)
+  {
+    free(stack);
+    stack = malloc(2 * 4096);
+    stack_address = (uint)stack;
+    stack += (4096 - (uint)stack %  4096);
+  }
+  else
+  {
+    stack_address = (uint)stack;
+  }
+  ((uint*)stack)[0] = stack_address;
+  printf(1, "2nd malloc: %p = %d\n", stack, (uint)stack);
   
   printf(1, "After initalization of page size in heap.\n");
   int pid = clone(instruction, arg, stack); // clone returns the PID
