@@ -4,7 +4,7 @@
 
 //Global variables used by all threads
 int ppid;
-int global = 1;
+int global = 0;
 
 // If assert is True then continue, if False then test failed so kill process
 #define assert(x) if (x) {} else { \
@@ -28,7 +28,7 @@ int
 main(int argc, char *argv[])
 {
    ppid = getpid();
-   global = 1;
+   global = 0;
    int arg = 45;
 
    if(argc != 2){
@@ -62,7 +62,7 @@ main(int argc, char *argv[])
     }
    // Checks worker data race for global
    printf(1, "Global = %d.\n", global);
-   assert(global == (n + 1));
+   assert(global == n);
 
    printf(1, "TEST PASSED\n\n");
    exit();
