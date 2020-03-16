@@ -4,9 +4,9 @@ RUN apt-get update
 
 RUN apt-get install -y git build-essential qemu-system-i386
 
-ADD https://api.github.com/repos/pnguy058/xv6-threads/git/refs/heads/clone version.json
+ADD https://api.github.com/repos/pnguy058/xv6-threads/git/refs/heads/master version.json
 
-RUN cd /root && git clone https://github.com/pnguy058/xv6-threads.git -b clone
+RUN cd /root && git clone https://github.com/pnguy058/xv6-threads.git
 
 WORKDIR /root/xv6-threads
 
