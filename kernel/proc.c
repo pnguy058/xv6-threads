@@ -267,7 +267,11 @@ exit(void)
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if((p->parent == curproc) && (p->pgdir == curproc->pgdir))
+<<<<<<< HEAD
       curproc->pgdir = copyuvm(p->pgdir, p-> sz);
+=======
+      curproc->pgdir = copyuvm(p->pgdir, p->sz);
+>>>>>>> 5e27eca81ec2db0d41380f64a26e4c705467ed70
     if(p->parent == curproc){
       p->parent = initproc;
       if(p->state == ZOMBIE)
@@ -652,7 +656,7 @@ join(void** stack)
       //cprintf( "Join: check z\n");
       if(p->state == ZOMBIE){
         // Found one.
-        //cprintf( "Join: ZOMBIE.\n");
+        cprintf( "Join: ZOMBIE.\n");
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -669,7 +673,7 @@ join(void** stack)
     }
     // No point waiting if we don't have any children.
     if(!havekids || curproc->killed){
-      //cprintf( "Join: No children.\n");
+      cprintf( "Join: No children.\n");
       release(&ptable.lock);
       return -1;
     }
