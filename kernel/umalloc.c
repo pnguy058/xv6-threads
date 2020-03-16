@@ -90,14 +90,15 @@ malloc(uint nbytes)
 }
 //We are putting these functions in umalloc because
 //the malloc and free functions are here.
+//User level call for clone()
 int
 thread_create(void (*instruction)(void*), void *arg)
 {
   int stack_address;
-  void *stack = malloc(4096);
+  void *stack = malloc(4096); //allocating a page size
   
-  
-  if((uint)stack % 4096 != 0)
+  //page aligning
+  if((uint)stack % 4096 != 0) //if not page aligned free and page align
   {
     free(stack);
     stack = malloc(2 * 4096);
@@ -108,20 +109,20 @@ thread_create(void (*instruction)(void*), void *arg)
   {
     stack_address = (uint)stack;
   }
-  ((uint*)stack)[0] = stack_address;
-  printf(1, "2nd malloc: %p = %d\n", stack, (uint)stack);
+  ((uint*)stack)[0] = stack_address; //setting new stack address in case not page aligned
+  //printf(1, "2nd malloc: %p = %d\n", stack, (uint)stack);
   
-  printf(1, "After initalization of page size in heap.\n");
+  //printf(1, "After initalization of page size in heap.\n");
   int pid = clone(instruction, arg, stack); // clone returns the PID
-  printf(1, "After pid is returned from clone.\n");
+  //printf(1, "After pid is returned from clone.\n");
   return pid;
 }
-
+//user level call for join()
 int
 thread_join()
 {
-  void *stack = (void*)0;
+  void *stack = (void*)0; //null stack
   int pid = join(&stack);
   free(stack);
-  return(pid); //swap again
+  return(pid);
 }
