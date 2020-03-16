@@ -185,6 +185,7 @@ UPROGS=\
 	_test\
 	_test_many\
 	_test_lock\
+	_test_lock2\
 
 
 fs.img: mkfs README $(UPROGS)
