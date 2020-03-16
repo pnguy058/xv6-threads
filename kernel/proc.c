@@ -266,12 +266,8 @@ exit(void)
 
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if((p->parent == curproc) && (p->pgdir == curproc->pgdir))
-<<<<<<< HEAD
-      curproc->pgdir = copyuvm(p->pgdir, p-> sz);
-=======
-      curproc->pgdir = copyuvm(p->pgdir, p->sz);
->>>>>>> 5e27eca81ec2db0d41380f64a26e4c705467ed70
+    if((p->parent == curproc) && (p->pgdir == curproc->pgdir)) //if parent process and pgdir are the same then this is a thread.
+      curproc->pgdir = copyuvm(p->pgdir, p->sz);               //copying thread memory for process
     if(p->parent == curproc){
       p->parent = initproc;
       if(p->state == ZOMBIE)
