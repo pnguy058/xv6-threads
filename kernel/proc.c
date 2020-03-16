@@ -111,7 +111,7 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-  p->is_thread = 0;
+  p->is_thread = 0; //is not thread
 
   return p;
 }
@@ -176,7 +176,7 @@ growproc(int n)
 
   acquire(&ptable.lock);
   for(tp = ptable.proc; tp < &ptable.proc[NPROC]; tp++){
-    if((tp->pgdir == curproc->pgdir) && (tp->parent == curproc))
+    if((tp->pgdir == curproc->pgdir) && (tp->parent == curproc)) //if thread is related to the process we have to change the size of the thread too.
     {
 		tp->sz = curproc->sz;
     }
@@ -297,6 +297,11 @@ wait(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->parent != curproc)
         continue;
+      if(p->pgdir == curproc->pgdir)
+	continue;
+      if(p->is_thread)//making sure that this is not a thread.
+	continue;
+     
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
@@ -555,7 +560,7 @@ procdump(void)
 int
 clone(void(*func)(void*),void *arg, void *stack){
 //Implement
-	cprintf( "In clone\n");
+	//cprintf( "In clone\n");
 	int i, pid;
   	struct proc *np;
   	struct proc *curproc = myproc();
@@ -576,7 +581,7 @@ clone(void(*func)(void*),void *arg, void *stack){
 		np->tstack_address = ((uint*)stack)[0];
 
 	np->pgdir = curproc->pgdir;
-	np->sz = (uint)stack + PGSIZE;
+	np->sz = (uint)stack + PGSIZE;	//top of the stack
 	np->parent = curproc;
 	np->is_thread = 1; //is thread
 	*np->tf = *curproc->tf;
@@ -586,8 +591,8 @@ clone(void(*func)(void*),void *arg, void *stack){
 	//Setting up the stack for the thread.
 	sp = (uint)stack + PGSIZE; //Setting the top of stack a page above the thread stack.
 	ustack[0] = 0xffffffff; 	//fake return PC
-	ustack[1] = (uint)arg;
-
+	ustack[1] = (uint)arg;		//start address of the thread
+	//setting up for copying kernel data to address.
 	sp = sp -  (2 * sizeof(uint));
 	//Moving memory
 	copyout(np->pgdir, sp, ustack, 2*sizeof(uint));
@@ -612,7 +617,7 @@ clone(void(*func)(void*),void *arg, void *stack){
 
 	release(&ptable.lock);
 
-	cprintf( "Exiting clone.\n");
+	//cprintf( "Exiting clone.\n");
 	return pid;
 }
 
@@ -644,7 +649,7 @@ join(void** stack)
         //cprintf( "Join: pgdir\n");
         continue;
       }
-      if (!(p->is_thread)) {
+      if (!(p->is_thread)) { //if not thread then move onto next item.
         //cprintf( "Join: thread\n");
         continue;
       }
@@ -652,7 +657,7 @@ join(void** stack)
       //cprintf( "Join: check z\n");
       if(p->state == ZOMBIE){
         // Found one.
-        cprintf( "Join: ZOMBIE.\n");
+        //cprintf( "Join: ZOMBIE.\n");
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -662,14 +667,14 @@ join(void** stack)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
-        *stack = (void*)p->tstack_address;
+        *stack = (void*)p->tstack_address; //settings stack address to free.
         release(&ptable.lock);
         return pid;
       }
     }
     // No point waiting if we don't have any children.
     if(!havekids || curproc->killed){
-      cprintf( "Join: No children.\n");
+      //cprintf( "Join: No children.\n");
       release(&ptable.lock);
       return -1;
     }
