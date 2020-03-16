@@ -2,6 +2,15 @@
 
 Our project consisted of implementing new system calls, `clone()` and `join()`, in xv6 which allowed us to create and wait for kernel level threads. We then build a thread libary by using `clone()` and implementing a simple ticket lock with `lock()` and `unlock()`.
 To due so we followed the instrunctions from CS153's Textbook author Remzi H. Arpaci-Dusseau in his Kernel Threads project repo. (https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/concurrency-xv6-threads). 
+
+## Building with Docker
+REQ: Docker Desktop installed and the `Dockerfile` in this repo downloaded. Skip to #5 to run on local cloned repo.
+1. `docker build -t xv6 .` Installs the requirements and clones the repo to create a docker image
+2. (To run auto test script) `docker run --rm -it xv6` Will execute the `entrypoint.sh` script which makes, and runs qemu-nox and auto tests `test_lock2`. This script was created for travis and isn't reccomended to test manually. Skip to #3
+3. `docker run --rm -it xv6 bash` Opens docker with workdir set to the cloned repo
+4. `cd kernel` -> `make` -> `make qemu-nox` Opens qemu in terminal. From there you can execute `ls` to view avaible commands or run the test scripts mentioned below.
+5. If you wish to run docker using the --volume tag, clone this repo -  `git clone https://github.com/pnguy058/xv6-threads.git`, and change terminal directory to it, copy the contents of `localDockerfile` to `Dockerfile`, then in console type `docker build -t xv6 .` and `docker run --rm -it xv6`. This will create image based on local /kernel files that you can make changes to.
+
 ## Clone
 
 We implemented the clone function call in the form of `clone(void(*func)(void*), void *arg, void *stack)`. `func` is the address passed in in which the thread will start executing at. The `arg` that is passed in will be put into our user stack. The `stack` is what the process uses as its new user stack which is passed in with a fake return PC and our `arg`. This function is a heavily modified version of `fork()` which handles processes.
