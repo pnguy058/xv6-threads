@@ -665,10 +665,6 @@ join(void** stack)
         return pid;
       }
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> 58c23ac070ba1ec52bc52b45f00d208af53a53e6
     // No point waiting if we don't have any children.
     if(!havekids || curproc->killed){
       //cprintf( "Join: No children.\n");
