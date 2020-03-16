@@ -1,3 +1,4 @@
+// Tests creating a single thread, then joining the thread.
 #include "types.h"
 #include "user.h"
 
@@ -12,7 +13,7 @@ int global = 1;
 #define assert(x) if (x) {} else { \
    printf(1, "%s: %d ", __FILE__, __LINE__); \
    printf(1, "assert failed (%s)\n", # x); \
-   printf(1, "TEST FAILED\n"); \
+   printf(1, "TEST FAILED\n\n"); \
    kill(ppid); \
    exit(); \
 }
@@ -29,17 +30,13 @@ main(int argc, char *argv[])
    printf(1, "Created thread 1. PID : %d\n\n", thread_pid1);
    assert(thread_pid1 > 0);
 
-   int threadpid2 = thread_create(worker, &arg);
-   printf(1, "creating thread 2. PID: %d\n\n", threadpid2);
-   assert(threadpid2 > 0);
-
    int join_pid = thread_join();
    printf(1, "Joined : %d\n", join_pid);
 
    printf(1, "global : %d\n", global);
    assert(global == 2);
 
-   printf(1, "TEST PASSED\n");
+   printf(1, "TEST PASSED\n\n");
    exit();
 }
 
