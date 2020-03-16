@@ -1,7 +1,7 @@
 # Kernel-level threads in xv6
 
-Our project will consist of implementing new `clone()` and `join()` system calls to the xv6 which will allow us to create kernel level threads. 
-
+Our project consisted of implementing new system calls, `clone()` and `join()`, in xv6 which allowed us to create and wait for kernel level threads. We then build a thread libary by using `clone()` and implementing a simple ticket lock with `lock()` and `unlock()`.
+To due so we followed the instrunctions from CS153's Textbook author Remzi H. Arpaci-Dusseau in his Kernel Threads project repo. (https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/concurrency-xv6-threads). 
 ## Clone
 
 We implemented the clone function call in the form of `clone(void(*func)(void*), void *arg, void *stack)`. `func` is the address passed in in which the thread will start executing at. The `arg` that is passed in will be put into our user stack. The `stack` is what the process uses as its new user stack which is passed in with a fake return PC and our `arg`. This function is a heavily modified version of `fork()` which handles processes.
@@ -11,3 +11,15 @@ We then implemented a new system call which is `int join(void** stack)`. This ca
 
 ## Umalloc.c file
 We placed two major user level function calls in here that calls `clone()` and `join()`. `thread_create()` and `thread_join` were placed inside of the umalloc.c file in order to access the `malloc()` function (allocating space in the heap for each new thread created) and the `free()` function (to free the stack allocated for the thread after its finished with it). The `thread_create()` function made sure that the page allocated by `malloc()` is page aligned. It also made sure to change the stack address of the allocated stack in case a change is needed.
+
+## Implementing Spinlocks
+We implemented two types of spinlocks. The first a ticket lock using FetchAndAdd , and the second a simple spinlock using TestAndSet.
+To begin we added a `lock_t` struct in `types.h`. The struct held three `uint` data fields: `ticket`, `turn`, and `flag`. The first two used by FetchAndAdd and the last by TestAndSet. In `ulib.c` we added three lock functions, `lock_init()` which initilizes the stuct data fields, `lock()` where the atomic instructions in `x86.h` are called, and `unlock()` which releases the lock as the name implies.
+
+## Test Files
+There are four test scripts in total. 
+`test_thread.c` simply creates a signle thread using `thread_create`, has the thread execute a simple increment of a global variable, exits, and then calls `thread_join` to cleanup.
+
+`thread_many.c` tests the creation/joining of multiple threads. This function takes a single pararamater as input that tells the program how may threads to create. Note - creating over 61 threads will cause the program to fault
+
+`test_lock` and `test_lock2` are nearly identical. The former test doesn't have spinlocks around the global variable each thread edits, causing the final value to be inncorrect and the test to fail. The latter adds spinlocks and the test passes.
