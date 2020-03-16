@@ -35,6 +35,9 @@ main(int argc, char *argv[])
 
    int threadpid2 = thread_create(worker, &arg);
    printf(1, "Thread 2 created with PID: %d\n", threadpid2);
+
+   int threadpid3 = thread_create(worker, &arg);
+   printf(1, "Thread 3 created with PID: %d\n", threadpid3);
    
    //int join_pid = thread_join();
    //printf(1, "After thread_join. Before join_pid assertion.\n");
@@ -45,6 +48,7 @@ main(int argc, char *argv[])
    printf(1, "Joining %d\n", join_pid);
    join_pid = thread_join();
    printf(1, "Joining %d\n", join_pid);
+   
    printf(1, "TEST PASSED\n");
    exit();
 }

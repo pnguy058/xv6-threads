@@ -30,6 +30,10 @@ main(int argc, char *argv[])
 
    assert(thread_pid1 > 0);
 
+   int threadpid2 = thread_create(worker, &arg);
+   printf(1, "creating thread 2. PID: %d\n\n", threadpid2);
+   assert(threadpid2 > 0);
+
    int join_pid = thread_join();
 
    printf(1, "Joined : %d\n", join_pid);
