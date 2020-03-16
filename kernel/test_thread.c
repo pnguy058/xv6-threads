@@ -25,12 +25,18 @@ main(int argc, char *argv[])
    ppid = getpid();
 
    int arg = 35;
-   int thread_pid = thread_create(worker, &arg);
-   assert(thread_pid > 0);
+   int thread_pid1 = thread_create(worker, &arg);
+   printf(1, "Created thread 1. PID : %d\n\n", thread_pid1);
+
+   assert(thread_pid1 > 0);
 
    int join_pid = thread_join();
-   assert(join_pid == thread_pid);
-   assert(global == 2);
+
+   printf(1, "Joined : %d\n", join_pid);
+   join_pid = thread_join();
+
+   printf(1, "global : %d\n", global);
+   assert(global == 1);
 
    printf(1, "TEST PASSED\n");
    exit();
@@ -40,7 +46,6 @@ void
 worker(void *arg_ptr) {
    int arg = *(int*)arg_ptr;
    assert(arg == 35);
-   assert(global == 1);
    global++;
    exit();
 }
