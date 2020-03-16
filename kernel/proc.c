@@ -38,10 +38,10 @@ struct cpu*
 mycpu(void)
 {
   int apicid, i;
-  
+
   if(readeflags()&FL_IF)
     panic("mycpu called with interrupts enabled\n");
-  
+
   apicid = lapicid();
   // APIC IDs are not guaranteed to be contiguous. Maybe we should have
   // a reverse map, or reserve a register to store &cpus[i].
@@ -125,7 +125,7 @@ userinit(void)
   extern char _binary_initcode_start[], _binary_initcode_size[];
 
   p = allocproc();
-  
+
   initproc = p;
   if((p->pgdir = setupkvm()) == 0)
     panic("userinit: out of memory?");
@@ -180,7 +180,7 @@ growproc(int n)
     {
 		tp->sz = curproc->sz;
     }
-  	
+
   }
   release(&ptable.lock);
   return 0;
@@ -287,7 +287,7 @@ wait(void)
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
-  
+
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for exited children.
@@ -337,7 +337,7 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
@@ -430,7 +430,7 @@ void
 sleep(void *chan, struct spinlock *lk)
 {
   struct proc *p = myproc();
-  
+
   if(p == 0)
     panic("sleep");
 
@@ -549,7 +549,7 @@ procdump(void)
 //as the process that calls it. The file descriptors will have to be copied. The most
 //convenient way we found to create new stacks for each thread was to create user stacks
 //which uses an argument and passes a fake return address to the PC. The new thread will
-//start executing at the address specified by the function. 
+//start executing at the address specified by the function.
 int
 clone(void(*func)(void*),void *arg, void *stack){
 //Implement
@@ -559,20 +559,20 @@ clone(void(*func)(void*),void *arg, void *stack){
   	struct proc *curproc = myproc();
 	uint sp; //Stack pointer
 	uint ustack[2]; //Setting up the thread stack like exec.c
-	
+
   	// Allocate process.
   	if((np = allocproc()) == 0){
     		return -1;
   	}
 
 	//We need to copy the process state from the current process.
-	
+
 	np->tstack = stack;
 	if(((uint*)stack)[0] == 0) //if clone was called without a stack already allocated
 		np->tstack_address = (uint)stack; //stack address will be the stack passed in
 	else			//else it was called with a stack allocated
-		np->tstack_address = ((uint*)stack)[0]; 
-	
+		np->tstack_address = ((uint*)stack)[0];
+
 	np->pgdir = curproc->pgdir;
 	np->sz = (uint)stack + PGSIZE;
 	np->parent = curproc;
@@ -585,16 +585,16 @@ clone(void(*func)(void*),void *arg, void *stack){
 	sp = (uint)stack + PGSIZE; //Setting the top of stack a page above the thread stack.
 	ustack[0] = 0xffffffff; 	//fake return PC
 	ustack[1] = (uint)arg;
-	
+
 	sp = sp -  (2 * sizeof(uint));
 	//Moving memory
 	copyout(np->pgdir, sp, ustack, 2*sizeof(uint));
 	//Seting the thread's stack pointer
 	np->tf->esp = sp;
-	
+
 	//Setting the same instruction pointer of the thread to the process
 	np->tf->eip = (uint)func;
-	
+
 	for(i = 0; i < NOFILE; i++)
 		if(curproc->ofile[i])
 			np->ofile[i] = filedup(curproc->ofile[i]);
@@ -609,7 +609,7 @@ clone(void(*func)(void*),void *arg, void *stack){
 	np->state = RUNNABLE;
 
 	release(&ptable.lock);
-	
+
 	cprintf( "Exiting clone.\n");
 	return pid;
 }
@@ -626,18 +626,31 @@ join(void** stack)
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
-  
+
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for exited children.
     havekids = 0;
+    cprintf( "Join: Kids.\n");
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       //Check if the child is a thread
-      if(p->parent != curproc || (p->pgdir != curproc->pgdir) || !(p->is_thread))
+      if((p->parent != curproc)) {
+        //cprintf( "Join: curproc\n");
         continue;
+      }
+      if ((p->pgdir != curproc->pgdir)) {
+        //cprintf( "Join: pgdir\n");
+        continue;
+      }
+      if (!(p->is_thread)) {
+        //cprintf( "Join: thread\n");
+        continue;
+      }
       havekids = 1;
+      //cprintf( "Join: check z\n");
       if(p->state == ZOMBIE){
         // Found one.
+        //cprintf( "Join: ZOMBIE.\n");
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -652,13 +665,14 @@ join(void** stack)
         return pid;
       }
     }
-    }
     // No point waiting if we don't have any children.
     if(!havekids || curproc->killed){
+      //cprintf( "Join: No children.\n");
       release(&ptable.lock);
       return -1;
     }
-    cprintf( "Exitting join.\n");
+    cprintf( "End join.\n");
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+  }
 }
