@@ -298,10 +298,10 @@ wait(void)
       if(p->parent != curproc)
         continue;
       if(p->pgdir == curproc->pgdir)
-	continue;
+	      continue;
       if(p->is_thread)//making sure that this is not a thread.
-	continue;
-     
+	      continue;
+
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
