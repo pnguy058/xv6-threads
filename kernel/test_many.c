@@ -4,7 +4,7 @@
 
 //Global variables used by all threads
 int ppid;
-int global = 0;
+int sharedInt = 0;
 
 // If assert is True then continue, if False then test failed so kill process
 #define assert(x) if (x) {} else { \
@@ -20,7 +20,7 @@ void
 worker(void *arg_ptr) {
    int arg = *(int*)arg_ptr;
    assert(arg == 45);
-   global++;
+   sharedInt++;
    exit();
 }
 
@@ -28,7 +28,7 @@ int
 main(int argc, char *argv[])
 {
    ppid = getpid();
-   global = 0;
+   sharedInt = 0;
    int arg = 45;
 
    if(argc != 2){
@@ -51,18 +51,18 @@ main(int argc, char *argv[])
    // Create n threads
    for(i = 0; i < n; i++) {
      thread_pid[i] = thread_create(worker, &arg);
-     printf(1, "Created thread %d. PID : %d\n", (i+1), thread_pid[i]);
+     printf(1, "Created Thread #%d with PID: %d\n", (i+1), thread_pid[i]);
      assert(thread_pid[i] > 0);
     }
    // Join n threads
    for(i = 0; i < n; i++) {
      join_pid = thread_join();
-     printf(1, "Joined : %d\n", join_pid);
+     printf(1, "Thread Joined with PID: %d\n", join_pid);
      assert(thread_pid[i] == join_pid);
     }
-   // Checks worker data race for global
-   printf(1, "Global = %d.\n", global);
-   assert(global == n);
+
+   printf(1, "sharedInt = %d\n", sharedInt);
+   assert(sharedInt == n);
 
    printf(1, "TEST PASSED\n\n");
    exit();
