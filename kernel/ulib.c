@@ -104,3 +104,26 @@ memmove(void *vdst, const void *vsrc, int n)
     *dst++ = *src++;
   return vdst;
 }
+
+// Next 3 functions are from Chapter 28, page 14 of the XV6 book
+
+// initialize lock, 0 = open, 1 = held
+void lock_init(lock_t* lock) {
+  //lock->ticket = 0;
+  //lock->turn = 0;
+  lock->flag = 0;
+}
+
+// Uses either the x86 atomic fetch-and-add routine or test-and-set
+// fetch-and-add routine: Fetches lock->ticket and atomically adds 1 and returns old value
+// test-and-set: if flag == 1, spin-wait, else atomically set flag to 1
+void lock(lock_t* lock) {
+  //uint myturn = fetch_and_add(&lock->ticket, 1);
+  //while(lock->turn != myturn) {} // spin-wait
+  while (xchg(&lock->flag, 1) == 1); //spin-wait
+}
+
+void unlock(lock_t* lock) {
+  //lock->turn = lock->turn + 1;  // release lock
+  lock->flag = 0;
+}
